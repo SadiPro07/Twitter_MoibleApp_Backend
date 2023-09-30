@@ -3,8 +3,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient, User } from '@prisma/client';
 
 // const JWT_SECRET = process.env.JWT_SECRET || 'SUPER SECRET';
-const JWT_SECREAT = process.env.JWT_SECREAT || "Super Secret";
-console.log("enviro", JWT_SECREAT);
+const JWT_SECRET = process.env.JWT_SECRET || "";
 const prisma = new PrismaClient();
 
 type AuthRequest = Request & { user?: User };
@@ -17,15 +16,16 @@ export async function authenticateToken(
   // Authentication
   const authHeader = req.headers['authorization'];
   const jwtToken = authHeader?.split(' ')[1];
-  console.log("token", jwtToken);
+  console.log("token-jwt", jwtToken);
   if (!jwtToken) {
     return res.sendStatus(401);
   }
   // decode the jwt token
   try {
-    const payload = (await jwt.verify(jwtToken, JWT_SECREAT)) as {
+    const payload = (await jwt.verify(jwtToken, JWT_SECRET)) as {
       tokenId: number;
     };
+    console.log("payload", payload)
     const dbToken = await prisma.token.findUnique({
       where: { id: payload.tokenId },
       include: { user: true },
@@ -37,6 +37,7 @@ export async function authenticateToken(
 
     req.user = dbToken.user;
   } catch (e) {
+    console.log("see error", e);
     return res.sendStatus(401);
   }
 

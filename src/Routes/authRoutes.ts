@@ -5,7 +5,7 @@ const router = Router();
 
 const EMAIL_TOKEN_EXPIRATION_MINUTES = 10;
 const AUTHENTICATION_EXPIRATION_HOURS = 12;
-const JWT_SECREAT = "Super Secret";
+const JWT_SECRET = process.env.JWT_SECRET || "";
 const prisma = new PrismaClient();
 
 // Generate a random 8 digit number as the email token
@@ -16,7 +16,7 @@ function generateEmailToken(): string {
 
 function generateAuthToken(tokenId: number) : string {
     const jwtPayload = { tokenId };
-    return jwt.sign(jwtPayload, JWT_SECREAT, {
+    return jwt.sign(jwtPayload, JWT_SECRET, {
         algorithm: "HS256",
         noTimestamp:true
     })
@@ -46,7 +46,7 @@ router.post("/login", async (req, res) => {
             }
         })
 
-        console.log('token', createdToken);
+        console.log('tokensssss23', createdToken);
         res.sendStatus(200);
     }
     catch (error) {
@@ -111,7 +111,9 @@ router.post('/authenticate', async (req, res) => {
   });
     
     //generate the JWT token
-    const authToken = generateAuthToken(apiToken.id);
+  const authToken = generateAuthToken(apiToken.id);
+  
+  console.log("success", authToken)
 
     res.json({ authToken });
 })
